@@ -1,23 +1,32 @@
 <!DOCTYPE html>
 <html>
-<body class = "rythm color2">
+<body class = "rythm-high color2">
 
-<audio controls  id="myAudio">
+  <style>
+    .color3 {
+        height: 100vw;
+        width: 100vw;
+    }
+
+  </style>
+
+<audio id="myAudio">
   <!-- <source src="horse.ogg" type="audio/ogg"> -->
-  <source src="/musics/LKTrungThuRemix-LEGDJ-3326058_hq.mp3" type="audio/mpeg">
+  <source src="/musics/ruocdenthangtam.mp3" type="audio/mpeg">
   <!-- <source src="/musics/LKTrungThuRemix-LEGDJ-3326058_hq.mp3" type="audio/mpeg"> -->
   Your browser does not support the audio element.
 </audio>
 
 <p id = "go">Click the buttons to play or pause the audio.</p>
 
-<button onclick="playAudio()" type="button">Play Audio</button>
+<button class = "rythm color3" onclick="playAudio()" type="button">Play Audio</button>
 <!-- <button onclick="pauseAudio()" type="button">Pause Audio</button>  -->
 <button onclick="stopAudio()" type="button">STOP Audio</button> 
-<h1 id = "time">time should be shown here</h1>
-<h1 id = "start">log ...</h1>
-<h1 id = "play">0:0</h1>
-<h1 id = "sync">0:0</h1>
+<h2 id = "time">time should be shown here</h4>
+<h2 id = "start">time start</h4>
+<h2 id = "play">00:00</h4>
+<h2 id = "sync">resume_time</h4>
+<h2>Song No <div id = "SongNo"></div></h4>
 <!-- <div class="rythm-bass">asdfasfdsa</div> -->
 
 
@@ -26,6 +35,7 @@
 
 <!-- <script src="/scripts/NoSleep.min.js"></script> -->
 <script type="text/javascript" src="/scripts/rythm.min.js"></script>
+<script type="text/javascript" src="/scripts/unmute.min.js"></script>
 <!-- <script>
   var noSleep = new NoSleep();
 
@@ -49,15 +59,21 @@
 
 
 <script>
+const audio_source = [
+  "/musics/ruocdenthangtam.mp3", "/musics/thungthinh.mp3","/musics/LKTrungThuRemix-LEGDJ-3326058_hq.mp3"
+];
+function isScreenLockSupported() {
+ return ('wakeLock' in navigator);
+}
 
-  
-  
+
   
   // rythm.setMusic('/musics/LKTrungThuRemix-LEGDJ-3326058_hq.mp3')
   
   var rythm = new Rythm()
   let x = document.getElementById("myAudio"); 
   let time_late = 0;
+  let songNo = 0;
   
 // function isiphone(){
 //   return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
@@ -76,6 +92,7 @@ const dasfd = document.getElementById('go')
 //   console.log("timed");
   
 // } 
+
 function stopAudio() { 
   // x.load(); 
   x.pause(); 
@@ -135,13 +152,29 @@ function sync2(){
     // x.fastSeek(0);
     // console.log("sycned");
     setInterval(ColorChange, 10000);
+    let screenLock = navigator.wakeLock.request('screen');
 }
+
+x.addEventListener('ended',function(){
+      //play next song
+    songNo++;
+    if(songNo >= audio_source.length)
+      songNo = 0;
+      
+    x.pause();
+    x.src = audio_source[songNo];
+    x.load();
+    // music.play();
+    playAudio();
+    });
+
 const myTimeout1 = setInterval(updatetimer, 100);
 
 const pos = document.getElementById('time');
 const pos1 = document.getElementById('start');
 const pos2 = document.getElementById('play');
 const pos3 = document.getElementById('sync');
+const posSongNo = document.getElementById('SongNo');
 
 function random_rgba() {
     
@@ -155,13 +188,19 @@ function ColorChange() {
         from: [o(r()*s),o(r()*s),o(r()*s)],
         to:[o(r()*s),o(r()*s),o(r()*s)]
     })
+
+    rythm.addRythm('color3', 'color', 0, 10, {
+      from: [0,0,255],
+      to:[255,0,255]
+    })
 }
 
 function updatetimer() {
     const start = syncTime();
-    pos2.innerText = x.currentTime;
+    posSongNo.innerText = songNo;
+    pos2.innerText = Math.round(x.currentTime * 100) / 100;
     // pos3.innerText =  Date.now() - time_late;
-    pos.innerText = start; // Date.now()
+    pos.innerText = Math.round(start * 10) / 10; // Date.now()
 }
 </script>
 
