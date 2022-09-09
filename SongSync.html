@@ -17,7 +17,7 @@
   Your browser does not support the audio element.
 </audio>
 
-<p id = "go">Click the buttons to play or pause the audio.</p>
+<p id = "go">Click the buttons to play with your friend (press the same time) </p>
 
 <button class = "rythm color3" onclick="playAudio()" type="button">Play Audio</button>
 <!-- <button onclick="pauseAudio()" type="button">Pause Audio</button>  -->
@@ -190,8 +190,8 @@ function ColorChange() {
     })
 
     rythm.addRythm('color3', 'color', 0, 10, {
-      from: [0,0,255],
-      to:[255,0,255]
+      from: [o(r()*s),o(r()*s),o(r()*s)],
+        to:[o(r()*s),o(r()*s),o(r()*s)]
     })
 }
 
