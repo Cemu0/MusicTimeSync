@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="scripts/peerjs.min.js"></script>
+    <script type="text/javascript" src="/scripts/rythm.min.js"></script>
+    <script type="text/javascript" src="/scripts/qrcode.min.js"></script>
+</head>
+<body class = "rythm color2">
+    <audio id="myAudio">
+        <!-- <source src="horse.ogg" type="audio/ogg"> -->
+        <source src="/musics/LKTrungThuRemix-LEGDJ-3326058_hq.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <h1>PeerID <div id = "PeerID">adfafs</div> </h1>
+    <div id="qrcode" style="width:500px; height:500px; margin-top:15px;"></div>
+    <h3>log: </h13>
+    <div id = "logged"></div>
+
+
+    
+
+    <button onclick="playAudio()" type="button">Play Audio</button>
+
+    <button onclick="sendSync()" type="button">SYNC</button>
+
+
+
+    <script>
+        let x = document.getElementById("myAudio"); 
+        let peerID = document.getElementById("PeerID"); 
+        let logged = document.getElementById("logged"); 
+        let QRpos = document.getElementById("qrcode");
+        var qrcode = new QRCode(QRpos, {
+            width : 500,
+            height : 500
+        });
+
+        let time_late = 0;
+        let peers  = [];
+        
+
+        function playAudio() {
+            var rythm = new Rythm()
+            rythm.connectExternalAudioElement(x);
+            rythm.addRythm('color2', 'color', 0, 10, {
+                from: [0,0,255],
+                to:[255,0,255]
+            });
+            x.play(); 
+            rythm.start()
+    
+            setTimeout(sync2, 1000);
+
+        }
+
+        function sync2(){
+            x.currentTime = 0;
+            time_late = performance.now();
+            setTimeout(sync1, 3000);
+        }
+
+        function sync1(){
+  
+            let asSync = performance.now() - time_late;
+            let delay = asSync - (x.currentTime * 1000);
+            // pos1.innerText = asSync
+            // pos3.innerText = delay
+            x.currentTime = delay / 1000;
+        }
+
+        //
+        var Connect_to = new URL(location.href).searchParams.get('peer')
+
+        //Sync over peerJS
+        var peer = new Peer();
+
+        
+        peer.on('open', function(id){
+            peerID.innerText = id;
+
+            if(Connect_to  !== null){
+                logged.innerHTML += "CLIENT MODE" + '\n'
+                
+                var conn = peer.connect(Connect_to);
+                // on open will be launch when you successfully connect to PeerServer
+                conn.on('open', function(){
+                    // here you have conn.id
+                    conn.send('hi! ' + peer.id + " wait for sync signal");
+                    logged.innerHTML += 'OpenSuccess\n'
+                });
+
+                conn.on('data', function(data){
+                    console.log(data); //data handle here only
+                    logged.innerHTML += data + '\n';
+                    sync1();
+                })
+            
+            QRpos.remove();
+
+            }else{
+                logged.innerHTML += "HOST MODE" + '\n'
+                
+                //create and display QR code
+                qrcode.makeCode("http://192.168.1.20:5500/songSyncPJS.html?peer=" + id);
+                
+                
+            }
+        })
+
+        if(Connect_to === null){
+            //HANDLE DATA FOR HOST 
+            peer.on('connection', function(conn) {
+                conn.on('data', function(data){
+                        //     console.log(data);
+                        //     logged.innerHTML += data + '\n';
+                        //     sync1();
+                        // }else{
+                            console.log(data);
+                            logged.innerHTML += data + '\n';
+                            // sync1();
+                            peers.push(conn);
+                        // }
+                });
+            });
+        }
+
+        
+        function sendSync(){
+            console.log("send sync");
+
+            peers.forEach(conn => {
+                console.log("sending");
+                conn.send('go');
+            });
+        }
+
+        f
+    </script>
+
+</body>
+</html>
