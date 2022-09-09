@@ -62,9 +62,9 @@
 const audio_source = [
   "musics/ruocdenthangtam.mp3", "musics/thungthinh.mp3","musics/LKTrungThuRemix-LEGDJ-3326058_hq.mp3"
 ];
-function isScreenLockSupported() {
- return ('wakeLock' in navigator);
-}
+// function isScreenLockSupported() {
+//  return ('wakeLock' in navigator);
+// }
 
 
   
@@ -155,7 +155,7 @@ function sync2(){
     // x.fastSeek(0);
     // console.log("sycned");
     setInterval(ColorChange, 10000);
-    let screenLock = navigator.wakeLock.request('screen');
+    // let screenLock = navigator.wakeLock.request('screen');
 }
 
 x.addEventListener('ended',function(){
